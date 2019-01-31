@@ -15,6 +15,7 @@
     "gatsby-plugin-canonical-urls": "^2.0.0-rc.2",
     "gatsby-plugin-catch-links": "^2.0.2",
     "gatsby-plugin-feed": "2.0.9",
+    "gatsby-plugin-flow": "^1.0.2",
     "gatsby-plugin-google-analytics": "^2.0.0-rc.2",
     "gatsby-plugin-manifest": "2.0.7",
     "gatsby-plugin-netlify": "^2.0.0-rc.2",
@@ -68,6 +69,7 @@
   "devDependencies": {
     "eslint": "^5.8.0",
     "eslint-config-gatsby-standard": "^2.1.0",
+    "flow-bin": "^0.91.0",
     "prettier": "^1.14.2",
     "stylelint": "9.7.1",
     "stylelint-config-prettier": "^4.0.0",

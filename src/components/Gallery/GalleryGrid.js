@@ -1,17 +1,34 @@
-import React from 'react'
+// @flow
+
+import React, { useState } from 'react'
 import Img from 'gatsby-image'
 import { chunk, sum } from 'lodash'
 import { Box, Link, Heading } from 'rebass'
 
 import Carousel, { Modal, ModalGateway } from 'react-images'
 
+type Props = {
+  images: {
+    id: string,
+    aspectRatio: number,
+    src: string,
+    srcSet: string,
+    fluid: string,
+    originalImg: string,
+    title: string,
+  }[],
+  itemsPerRow?: number[],
+  title: string,
+  slug: string,
+}
+
 const Gallery = ({
   title,
   slug,
   images,
-  itemsPerRow: itemsPerRowByBreakpoints,
-}) => {
-  const aspectRatios = images.map(image => image.fluid.aspectRatio)
+  itemsPerRow: itemsPerRowByBreakpoints = [1],
+}: Props) => {
+  const aspectRatios = images.map(image => image.aspectRatio)
   const rowAspectRatioSumsByBreakpoints = itemsPerRowByBreakpoints.map(
     itemsPerRow =>
       chunk(aspectRatios, itemsPerRow).map(rowAspectRatios =>
@@ -19,74 +36,57 @@ const Gallery = ({
       )
   )
 
-  class GalleryModal extends React.Component {
-    state = { modalIsOpen: false }
-    toggleModal = () => {
-      this.setState(state => ({ modalIsOpen: !state.modalIsOpen }))
-    }
-    render() {
-      const { modalIsOpen } = this.state
+  const [modalIsOpen, setModalIsOpen] = useState(false)
+  const [modalCurrentIndex, setModalCurrentIndex] = useState(0)
 
-      return (
-        <>
-          <Box key={slug} p={[4, 5]}>
-            <Heading key={title}>{title}</Heading>
-            {images.map((image, i) => (
-              <Link
-                key={image.id}
-                href={image.originalImg}
-                onClick={this.toggleModal}
-              >
-                <Box
-                  as={Img}
-                  key={image}
-                  fluid={image.fluid}
-                  title={image.title}
-                  width={rowAspectRatioSumsByBreakpoints.map(
-                    (rowAspectRatioSums, j) => {
-                      const rowIndex = Math.floor(
-                        i / itemsPerRowByBreakpoints[j]
-                      )
-                      const rowAspectRatioSum = rowAspectRatioSums[rowIndex]
+  const closeModal = () => setModalIsOpen(false)
+  const openModal = (imageIndex: number) => {
+    setModalCurrentIndex(imageIndex)
+    setModalIsOpen(true)
+  }
 
-                      return `${(image.fluid.aspectRatio / rowAspectRatioSum) *
-                        100}%`
-                    }
-                  )}
-                  css={`
+  return (
+    <Box p={[4, 5]}>
+      <Heading key={title}>{title}</Heading>
+      {images.map((image, i) => (
+        <Link key={image.id} onClick={() => openModal(i)}>
+          <Box
+            as={Img}
+            key={image.id}
+            fluid={image.fluid}
+            title={image.title}
+            width={rowAspectRatioSumsByBreakpoints.map(
+              (rowAspectRatioSums, j) => {
+                const rowIndex = Math.floor(i / itemsPerRowByBreakpoints[j])
+                const rowAspectRatioSum = rowAspectRatioSums[rowIndex]
+
+                return `${(image.aspectRatio / rowAspectRatioSum) * 100}%`
+              }
+            )}
+            css={`
             display: inline-block;
             vertical-align: middle;
             objectFit: 'cover !important',
             height: '100%',
           `}
-                />
-              </Link>
-            ))}
-          </Box>
-
-          {ModalGateway && (
-            <ModalGateway>
-              {modalIsOpen && (
-                <Modal onClose={this.toggleModal}>
-                  <Carousel
-                    views={images.map(({ image }) => ({
-                      source: image,
-                    }))}
-                  />
-                </Modal>
-              )}
-            </ModalGateway>
+          />
+        </Link>
+      ))}
+      {ModalGateway && (
+        <ModalGateway>
+          {modalIsOpen && (
+            <Modal onClose={closeModal}>
+              <Carousel
+                views={images.map(({ originalImg }) => ({
+                  source: originalImg,
+                }))}
+                currentIndex={modalCurrentIndex}
+              />
+            </Modal>
           )}
-        </>
-      )
-    }
-  }
-
-  return (
-    <>
-      <GalleryModal />
-    </>
+        </ModalGateway>
+      )}
+    </Box>
   )
 }
-
 export default Gallery
