@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import Img from 'gatsby-image'
 import { chunk, sum } from 'lodash'
 import { Box, Link, Heading } from 'rebass'
-
 import Carousel, { Modal, ModalGateway } from 'react-images'
 
 type Props = {
@@ -26,7 +25,7 @@ const Gallery = ({
   title,
   slug,
   images,
-  itemsPerRow: itemsPerRowByBreakpoints = [1],
+  itemsPerRow: itemsPerRowByBreakpoints = [1, 2, 3, 4],
 }: Props) => {
   const aspectRatios = images.map(image => image.aspectRatio)
   const rowAspectRatioSumsByBreakpoints = itemsPerRowByBreakpoints.map(
